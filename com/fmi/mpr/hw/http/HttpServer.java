@@ -3,8 +3,6 @@ package com.fmi.mpr.hw.http;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class HttpServer {
 	
@@ -35,8 +33,8 @@ public class HttpServer {
 				
 				System.out.printf("New connection from %s. Processing...%n", newConnection.getInetAddress());
 				
-				HttpRequestHendler client = new HttpRequestHendler(newConnection);
-				client.processRequest();
+				HttpRequestHendler request = new HttpRequestHendler(newConnection);
+				request.processRequest();
 				
 			} catch (IOException e) {
 				e.printStackTrace();

@@ -42,7 +42,7 @@ public class HttpRequestHendler {
 	}
 	
 	public void processRequest() throws IOException {
-		processRequestHeaders();
+		getInfoFromRequestHeaders();
 		
 		if ("GET".equals(requestMethod) && "/".equals(this.path)) {
 			sendHttpResponse("index.html", "200 OK", "");
@@ -57,7 +57,7 @@ public class HttpRequestHendler {
 		}
 	}
 
-	private void processRequestHeaders() throws IOException {
+	private void getInfoFromRequestHeaders() throws IOException {
 		StringBuilder firstLine = new StringBuilder(64);
 		reader.readLine().stream().forEach(b -> firstLine.append((char) b.byteValue()));
 		
@@ -69,7 +69,6 @@ public class HttpRequestHendler {
 		List<Byte> lineBytes;
 		while (true) {			
 			lineBytes = reader.readLine();
-			lineBytes.stream().forEach(b -> System.out.print((char) b.byteValue()));
 			if (lineBytes.size() == 2) {
 				break;
 			}
@@ -89,10 +88,8 @@ public class HttpRequestHendler {
 			}
 
 			try (FileInputStream fis = new FileInputStream(file)) {
-				
 				int bytesRead = 0;
 				byte[] buffer = new byte[8192];
-				
 				while ((bytesRead = fis.read(buffer, 0, 8192)) > 0) {
 					ps.write(buffer, 0, bytesRead);
 				}
@@ -115,12 +112,10 @@ public class HttpRequestHendler {
 			fileName = matcher.group(0);
 		}
 		
-		List<Byte> bytes = null;
-		bytes = reader.readLine();
-		bytes.stream().forEach(b -> System.out.print((char) b.byteValue()));
-		bytes = reader.readLine();
-		bytes.stream().forEach(b -> System.out.print((char) b.byteValue()));
+		reader.readLine();
+		reader.readLine();
 		
+		List<Byte> bytes = null;
 		byte[] byteLine = null;
 		
 		try (FileOutputStream fos = new FileOutputStream(new File("files\\" + fileName))) {
@@ -131,7 +126,6 @@ public class HttpRequestHendler {
 				for (int i = 0; i < bytes.size(); i++) {
 					byteLine[i] = bytes.get(i).byteValue();
 				}
-				System.out.println(new String(byteLine));
 				
 				if (new String(byteLine).equals(boarder.toString())) {
 					break;
