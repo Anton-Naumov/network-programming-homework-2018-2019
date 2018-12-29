@@ -35,7 +35,7 @@ public class HttpServer {
 				
 				System.out.printf("New connection from %s. Processing...%n", newConnection.getInetAddress());
 				
-				HttpClient client = new HttpClient(newConnection);
+				HttpRequestHendler client = new HttpRequestHendler(newConnection);
 				client.processRequest();
 				
 			} catch (IOException e) {
