@@ -1,8 +1,15 @@
 package com.fmi.mpr.hw.http;
 
+import java.io.IOException;
+
 public class Main {
 
 	public static void main(String[] args) {
-		System.out.println("Test");
+		try {
+			HttpServer server = new HttpServer();
+			server.start();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
