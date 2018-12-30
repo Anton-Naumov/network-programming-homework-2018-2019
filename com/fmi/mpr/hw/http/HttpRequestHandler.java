@@ -3,7 +3,6 @@ package com.fmi.mpr.hw.http;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -15,7 +14,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HttpRequestHendler {
+public class HttpRequestHandler {
 	
 	private Socket socket;
 	private String requestMethod;
@@ -36,7 +35,7 @@ public class HttpRequestHendler {
 	     put("txt", "text/plain");
 	}};
 	 
-	public HttpRequestHendler(Socket socket) throws IOException {
+	public HttpRequestHandler(Socket socket) throws IOException {
 		this.socket = socket;
 		reader = new BufferedInputStream(socket.getInputStream());
 	}
@@ -46,9 +45,9 @@ public class HttpRequestHendler {
 		
 		if ("GET".equals(requestMethod) && "/".equals(this.path)) {
 			sendHttpResponse("index.html", "200 OK", "");
-		} else if ("GET".equals(requestMethod) && this.path.matches("\\/\\w+\\.\\w+")) {
+		} else if ("GET".equals(requestMethod) && this.path.matches("\\/[\\w-_ !]+\\.\\w+")) {
 			sendFile(this.path.substring(1));
-		} else if ("GET".equals(requestMethod) && this.path.matches("\\/\\?fileName=\\w+\\.\\w+")) {
+		} else if ("GET".equals(requestMethod) && this.path.matches("\\/\\?fileName=[\\w-_ !]+\\.\\w+")) {
 			sendFile(this.path.substring(11));
 		} else if ("POST".equals(requestMethod)) {
 			uploadFile();
@@ -76,16 +75,16 @@ public class HttpRequestHendler {
 	}
 	
 	private void sendFile(String fileName) throws IOException {
+		File file = new File("files\\" + fileName);
+		if (!file.exists()) {
+			sendHttpResponse("simple.html", "404 Not Found", "File with name \"" + fileName + "\"" + " not found!");
+			return;
+		}
+	
 		try (PrintStream ps = new PrintStream(socket.getOutputStream(), true)) {
 			ps.println("HTTP/1.0 200 OK");
 			ps.println("Content-Type: " + contTypeForExtention.get(fileName.split("\\.")[1]));
 			ps.println();
-			
-			File file = new File("files\\" + fileName);
-			if (!file.exists()) {
-				sendHttpResponse("simple.html", "404 Not Found", "File with name \"" + fileName + "\"" + " not found!");
-				return;
-			}
 
 			try (FileInputStream fis = new FileInputStream(file)) {
 				int bytesRead = 0;
@@ -99,10 +98,10 @@ public class HttpRequestHendler {
 	}
 	
 	private void uploadFile() throws IOException {
-		StringBuilder boarder = new StringBuilder(64);
-		reader.readLine().stream().forEach(b -> boarder.append((char) b.byteValue()));
-		boarder.insert(boarder.length() - 2, "--");
-		
+		StringBuilder border = new StringBuilder(64);
+		reader.readLine().stream().forEach(b -> border.append((char) b.byteValue()));
+		border.insert(border.length() - 2, "--");
+
 		StringBuilder lineWithFileName = new StringBuilder(64);
 		reader.readLine().stream().forEach(b -> lineWithFileName.append((char) b.byteValue()));
 		
@@ -127,7 +126,7 @@ public class HttpRequestHendler {
 					byteLine[i] = bytes.get(i).byteValue();
 				}
 				
-				if (new String(byteLine).equals(boarder.toString())) {
+				if (new String(byteLine).equals(border.toString())) {
 					break;
 				} else {
 					fos.write(byteLine, 0, byteLine.length);

@@ -33,7 +33,7 @@ public class HttpServer {
 				
 				System.out.printf("New connection from %s. Processing...%n", newConnection.getInetAddress());
 				
-				HttpRequestHendler request = new HttpRequestHendler(newConnection);
+				HttpRequestHandler request = new HttpRequestHandler(newConnection);
 				request.processRequest();
 				
 			} catch (IOException e) {
