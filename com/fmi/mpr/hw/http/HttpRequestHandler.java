@@ -45,9 +45,9 @@ public class HttpRequestHandler {
 		
 		if ("GET".equals(requestMethod) && "/".equals(this.path)) {
 			sendHttpResponse("index.html", "200 OK", "");
-		} else if ("GET".equals(requestMethod) && this.path.matches("\\/[\\w-_ !]+\\.\\w+")) {
+		} else if ("GET".equals(requestMethod) && this.path.matches("\\/[\\w-_ !]+\\.\\w+")) { // the file name is given directly in the URL after the slash
 			sendFile(this.path.substring(1));
-		} else if ("GET".equals(requestMethod) && this.path.matches("\\/\\?fileName=[\\w-_ !]+\\.\\w+")) {
+		} else if ("GET".equals(requestMethod) && this.path.matches("\\/\\?fileName=[\\w-_ !]+\\.\\w+")) { // the file name is given as URL param "fileName"
 			sendFile(this.path.substring(11));
 		} else if ("POST".equals(requestMethod)) {
 			uploadFile();
@@ -68,7 +68,7 @@ public class HttpRequestHandler {
 		List<Byte> lineBytes;
 		while (true) {			
 			lineBytes = reader.readLine();
-			if (lineBytes.size() == 2) {
+			if (lineBytes.size() == 2) { // the line is empty, the 2 symbols are \r\n
 				break;
 			}
 		}
@@ -100,7 +100,7 @@ public class HttpRequestHandler {
 	private void uploadFile() throws IOException {
 		StringBuilder border = new StringBuilder(64);
 		reader.readLine().stream().forEach(b -> border.append((char) b.byteValue()));
-		border.insert(border.length() - 2, "--");
+		border.insert(border.length() - 2, "--"); // add "--" so it looks exactly the same as the closing border
 
 		StringBuilder lineWithFileName = new StringBuilder(64);
 		reader.readLine().stream().forEach(b -> lineWithFileName.append((char) b.byteValue()));
@@ -111,8 +111,8 @@ public class HttpRequestHandler {
 			fileName = matcher.group(0);
 		}
 		
-		reader.readLine();
-		reader.readLine();
+		reader.readLine(); // skip line with content type
+		reader.readLine(); // skip empty line
 		
 		List<Byte> bytes = null;
 		byte[] byteLine = null;

@@ -29,6 +29,7 @@ public class HttpServer {
 	
 	private void run() {
 		while (isRunning) {
+			System.out.println("Server working. Waiting for request...");
 			try (Socket newConnection = serverSocket.accept()) {
 				
 				System.out.printf("New connection from %s. Processing...%n", newConnection.getInetAddress());
